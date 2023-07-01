@@ -13,7 +13,7 @@ class Fridge(Observer):
     This class takes care of the actual locking and unlocking of the electromagnetic lock.
     """
 
-    def __init__(self, gpio_pin, default_value=GPIO.LOW):
+    def __init__(self, gpio_pin, default_value=GPIO.HIGH):
         """Initialize Fridge class."""
         self.gpio_pin = gpio_pin
         self.setup(default_value)
