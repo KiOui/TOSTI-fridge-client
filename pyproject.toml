@@ -34,7 +34,6 @@ name = "piwheels"
 url = "https://piwheels.org/simple/"
 priority = "primary"
 
-
 [[tool.poetry.source]]
 name = "PyPI"
 priority = "default"

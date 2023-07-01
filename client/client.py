@@ -56,7 +56,7 @@ class Main:
             for fridge_unlock_information in data["unlock"]:
                 fridge_name = fridge_unlock_information["fridge"]
                 if fridge_name in self.fridge_locks.keys():
-                    unlock_for = float(fridge_unlock_information['unlock_for'])
+                    unlock_for = float(fridge_unlock_information["unlock_for"])
                     logger.debug("Unlocking fridge {} for {} seconds".format(fridge_name, unlock_for))
                     self.fridge_locks[fridge_name].unlock_for(unlock_for)
         else:
