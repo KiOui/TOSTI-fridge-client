@@ -32,10 +32,9 @@ build-backend = "poetry.core.masonry.api"
 [[tool.poetry.source]]
 name = "piwheels"
 url = "https://piwheels.org/simple/"
-priority = "default"
+priority = "primary"
 
 
 [[tool.poetry.source]]
 name = "PyPI"
-priority = "supplemental"
-
+priority = "default"
