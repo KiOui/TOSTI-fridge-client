@@ -2,8 +2,10 @@
 This is the configuration file for the TOSTI fridge client.
 """
 from scanners import Camera
+from fridge import Fridge
 
 SCANNER_CLASS = Camera
+FRIDGE_CLASS = Fridge
 CLIENT_SECRET = "[Client Secret]"
 CLIENT_ID = "[Client ID]"
 API_BASE_URL = "https://tosti.science.ru.nl"

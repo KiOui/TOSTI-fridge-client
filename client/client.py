@@ -2,7 +2,6 @@ from threading import Lock as ThreadLock
 
 from api.clientcredentials import TostiClientCredentialsAPIService
 from exceptions import ImproperlyConfigured
-from fridge import Fridge
 from lock import Lock
 import threading
 from optparse import OptionParser
@@ -40,7 +39,7 @@ class Main:
                 lock_connected_gpio_pins = lock_configuration["connected_gpio_pins"]
                 lock = Lock(lock_identifier)
                 for gpio_pin in lock_connected_gpio_pins:
-                    lock.register_observer(Fridge(gpio_pin))
+                    lock.register_observer(self.settings.FRIDGE_CLASS(gpio_pin))
                 self.fridge_locks[lock_identifier] = lock
 
     def _process(self, to_process: str):

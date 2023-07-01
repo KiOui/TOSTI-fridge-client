@@ -1,9 +1,11 @@
 """
 This is the configuration file for the TOSTI fridge client.
 """
+from fakefridge import FakeFridge
 from scanners import Console
 
 SCANNER_CLASS = Console
+FRIDGE_CLASS = FakeFridge
 CLIENT_SECRET = (
     "wYQ8OJyEK85G7bN6DFuE5SekD8noHK0R3CoF6piVtX68Mv21vyQxhcmXtsJtR7y5dDgw7a0ldOLOcH4mYFC8ziyPVgQZjjoS"
     "R8azEjcVO01TWpAfT3p3aC0uA9Z1qMUY"
