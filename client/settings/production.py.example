@@ -1,0 +1,16 @@
+"""
+This is the configuration file for the TOSTI fridge client.
+"""
+from scanners import Console
+
+SCANNER_CLASS = Console
+CLIENT_SECRET = "[Client Secret]"
+CLIENT_ID = "[Client ID]"
+API_BASE_URL = "https://tosti.science.ru.nl"
+
+LOCK_CONFIGURATION = [
+    {
+        "slug": "beerfridge",
+        "connected_gpio_pins": [2, 3, 4],
+    },
+]
