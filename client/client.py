@@ -1,3 +1,4 @@
+import logging
 from threading import Lock as ThreadLock
 
 from api.clientcredentials import TostiClientCredentialsAPIService
@@ -44,19 +45,26 @@ class Main:
 
     def _process(self, to_process: str):
         """Process a non-duplicate entry from the scanner."""
+        logging.debug("Processing {}".format(to_process))
         answer = self.tosti_client.post("/api/v1/fridges/unlock/", {"user_token": to_process})
         if answer.status_code == 200:
             data = answer.json()
+            logging.debug("Received {} from the server.".format(data))
             for fridge_unlock_information in data["unlock"]:
                 fridge_name = fridge_unlock_information["fridge"]
                 if fridge_name in self.fridge_locks.keys():
-                    self.fridge_locks[fridge_name].unlock_for(5)
+                    logging.debug("Unlocking fridge {} for {} seconds".format(fridge_name, fridge_unlock_information['unlock_for']))
+                    self.fridge_locks[fridge_name].unlock_for(fridge_unlock_information['unlock_for'])
+        else:
+            logging.debug("Server responded with status code {}".format(answer.status_code))
 
     def process_scanner_result(self, scanner_result):
         """Process a result from the scanner."""
+        logging.debug("Scan result found: {}".format(scanner_result))
         with self._lock:
             if scanner_result in self._currently_processing_records:
                 # Do not process a record that is currently being processed.
+                logging.debug("Scanner result is already being processed, skipping.")
                 return
             else:
                 self._currently_processing_records.append(scanner_result)
@@ -90,7 +98,16 @@ def parse_arguments():
         help="The settings file to use.",
         default="settings",
     )
+    parser.add_option(
+        "--verbose",
+        dest="verbose",
+        action="store_true",
+        help="Enable verbose logging.",
+        default=False,
+    )
     options, arguments = parser.parse_args()
+    if options.verbose:
+        logging.basicConfig(level=logging.DEBUG)
     return options, arguments
 
 
