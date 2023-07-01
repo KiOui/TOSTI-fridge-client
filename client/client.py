@@ -10,6 +10,9 @@ from optparse import OptionParser
 from settings.settings import Settings
 
 
+logger = logging.getLogger()
+
+
 class Main:
     """Main class."""
 
@@ -45,18 +48,18 @@ class Main:
 
     def _process(self, to_process: str):
         """Process a non-duplicate entry from the scanner."""
-        logging.debug("Processing {}".format(to_process))
+        logger.debug("Processing {}".format(to_process))
         answer = self.tosti_client.post("/api/v1/fridges/unlock/", {"user_token": to_process})
         if answer.status_code == 200:
             data = answer.json()
-            logging.debug("Received {} from the server.".format(data))
+            logger.debug("Received {} from the server.".format(data))
             for fridge_unlock_information in data["unlock"]:
                 fridge_name = fridge_unlock_information["fridge"]
                 if fridge_name in self.fridge_locks.keys():
-                    logging.debug("Unlocking fridge {} for {} seconds".format(fridge_name, fridge_unlock_information['unlock_for']))
+                    logger.debug("Unlocking fridge {} for {} seconds".format(fridge_name, fridge_unlock_information['unlock_for']))
                     self.fridge_locks[fridge_name].unlock_for(fridge_unlock_information['unlock_for'])
         else:
-            logging.debug("Server responded with status code {}".format(answer.status_code))
+            logger.debug("Server responded with status code {}".format(answer.status_code))
 
     def process_scanner_result(self, scanner_result):
         """Process a result from the scanner."""
@@ -64,7 +67,7 @@ class Main:
         with self._lock:
             if scanner_result in self._currently_processing_records:
                 # Do not process a record that is currently being processed.
-                logging.debug("Scanner result is already being processed, skipping.")
+                logger.debug("Scanner result is already being processed, skipping.")
                 return
             else:
                 self._currently_processing_records.append(scanner_result)
@@ -76,6 +79,7 @@ class Main:
 
     def run(self):
         """Run the main loop."""
+        logger.debug("Startup complete, starting main loop.")
         try:
             while True:
                 next_input = self.scanner.scan()
@@ -106,14 +110,14 @@ def parse_arguments():
         default=False,
     )
     options, arguments = parser.parse_args()
-    if options.verbose:
-        logging.basicConfig(level=logging.DEBUG)
     return options, arguments
 
 
 def main(options, arguments):
     """Load settings and run the main thread."""
     settings = Settings(options.settings)
+    if options.verbose:
+        logging.basicConfig(level=logging.DEBUG)
     main_thread = Main(settings)
     main_thread.run()
 
