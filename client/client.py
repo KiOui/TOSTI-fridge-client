@@ -118,7 +118,7 @@ def main(options, arguments):
     """Load settings and run the main thread."""
     settings = Settings(options.settings)
     if options.verbose:
-        logging.basicConfig(level=logging.DEBUG)
+        logger.setLevel(logging.DEBUG)
     main_thread = Main(settings)
     main_thread.run()
 
