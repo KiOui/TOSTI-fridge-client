@@ -1,5 +1,9 @@
 """
 This is the configuration file for the TOSTI fridge client.
+
+The development settings are configured in such a way that they don't make use of GPIO pins (because these are only
+present on a Raspberry Pi). These settings can also be configured to run with a FakeFridge (that just outputs its
+locked value when changed).
 """
 from fakefridge import FakeFridge
 from scanners import Console

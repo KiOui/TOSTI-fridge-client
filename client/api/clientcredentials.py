@@ -13,6 +13,7 @@ class TostiClientCredentialsAPIService(TostiAPIService):
         self._token = None
 
     def _get_token(self):
+        """Get a new OAuth 2.0 token."""
         client = BackendApplicationClient(client_id=self.client_id)
         oauth = OAuth2Session(client=client, scope=self.scope)
 
@@ -25,14 +26,17 @@ class TostiClientCredentialsAPIService(TostiAPIService):
 
     @property
     def token(self):
+        """Get the token."""
         return self._token
 
     @token.setter
     def token(self, token):
+        """Set the token."""
         self._token = token
 
     @property
     def _client(self):
+        """Get the client."""
         if self._token is None:
             self._get_token()
         return OAuth2Session(
