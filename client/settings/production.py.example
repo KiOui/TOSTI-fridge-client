@@ -13,6 +13,6 @@ API_BASE_URL = "https://tosti.science.ru.nl"
 LOCK_CONFIGURATION = [
     {
         "slug": "beerfridge",
-        "connected_gpio_pins": [2, 3, 4],
+        "connected_gpio_pins": [4],
     },
 ]

@@ -1,4 +1,5 @@
 import cv2
+from pyzbar.pyzbar import decode
 
 
 class Scanner:
@@ -28,8 +29,11 @@ class Camera(Scanner):
     def scan(self):
         """Scan from a camera image."""
         _, img = self.cap.read()
-        data, _, _ = self.detector.detectAndDecode(img)
-        return data
+        data = decode(img)
+        if len(data) > 0:
+            data = data[0]
+            return data.data.decode("utf-8")
+        return None
 
     def __del__(self):
         """Stop camera stream."""
