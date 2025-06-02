@@ -8,12 +8,13 @@ readme = "README.md"
 packages = [{include = "client"}]
 
 [tool.poetry.dependencies]
+# Core dependencies (work on all platforms)
 python = "^3.11"
 oauthlib = "^3.2.2"
 requests-oauthlib = "^2.0.0"
 
 [tool.poetry.group.production.dependencies]
-RPi.GPIO = "^0.7.1"
+"RPi.GPIO" = "^0.7.1"
 
 [tool.poetry.group.dev.dependencies]
 pydocstyle = "^6.3.0"
