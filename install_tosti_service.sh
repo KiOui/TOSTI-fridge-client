@@ -81,7 +81,7 @@ print_status "✅ Using existing production.py configuration"
 print_status "🐍 Installing Python dependencies..."
 cd "$APP_DIR"
 export PATH="$HOME/.local/bin:$PATH"
-poetry install --only=main
+poetry install --with=production
 
 # Set up serial port permissions
 print_status "🔐 Setting up serial port permissions..."
