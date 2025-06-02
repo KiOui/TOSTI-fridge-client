@@ -48,8 +48,8 @@ if [ -f "$ENV_FILE" ]; then
     fi
     api_url=$($SUDO grep "TOSTI_API_BASE_URL=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2-)
     echo "  🌐 API_BASE_URL: ${api_url:-[NOT SET]}"
-    serial_device=$($SUDO grep "TOSTI_SERIAL_DEVICE=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2-)
-    echo "  📱 SERIAL_DEVICE: ${serial_device:-[NOT SET]}"
+    serial_input=$($SUDO grep "TOSTI_SERIAL_INPUT=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2-)
+    echo "  📱 SERIAL_INPUT: ${serial_input:-[NOT SET]}"
     echo
 else
     print_warning "Environment file not found. Creating new configuration."
@@ -61,7 +61,7 @@ if [ -f "$ENV_FILE" ]; then
     current_client_id=$($SUDO grep "TOSTI_CLIENT_ID=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2-)
     current_client_secret=$($SUDO grep "TOSTI_CLIENT_SECRET=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2-)
     current_api_url=$($SUDO grep "TOSTI_API_BASE_URL=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2-)
-    current_serial_device=$($SUDO grep "TOSTI_SERIAL_DEVICE=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2-)
+    current_serial_input=$($SUDO grep "TOSTI_SERIAL_INPUT=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2-)
 fi
 
 # Set defaults
@@ -90,11 +90,11 @@ print_status "🔍 Available serial devices:"
 ls -la /dev/serial/by-id/ 2>/dev/null || echo "No serial devices found"
 echo
 
-if [ -n "$current_serial_device" ]; then
-    read -p "📱 Serial Port [$current_serial_device]: " serial_device
-    serial_device=${serial_device:-$current_serial_device}
+if [ -n "$current_serial_input" ]; then
+    read -p "📱 Serial Port [$current_serial_input]: " serial_input
+    serial_input=${serial_input:-$current_serial_input}
 else
-    read -p "📱 Serial Port: " serial_device
+    read -p "📱 Serial Port: " serial_input
 fi
 
 # Validate inputs
@@ -113,14 +113,14 @@ if [ -z "$api_url" ]; then
     exit 1
 fi
 
-if [ -z "$serial_device" ]; then
+if [ -z "$serial_input" ]; then
     print_error "Serial port cannot be empty"
     exit 1
 fi
 
 # Check if serial port exists
-if [ ! -e "$serial_device" ]; then
-    print_warning "Serial port $serial_device not found!"
+if [ ! -e "$serial_input" ]; then
+    print_warning "Serial port $serial_input not found!"
     print_status "🔍 Available serial devices:"
     ls -la /dev/serial/by-id/ 2>/dev/null || echo "No serial devices found"
     echo
@@ -139,7 +139,7 @@ $SUDO tee "$ENV_FILE" > /dev/null << EOF
 TOSTI_CLIENT_SECRET=$client_secret
 TOSTI_CLIENT_ID=$client_id
 TOSTI_API_BASE_URL=$api_url
-TOSTI_SERIAL_DEVICE=serial_device
+TOSTI_SERIAL_INPUT=$serial_input
 EOF
 
 # Set secure permissions
@@ -151,7 +151,7 @@ print_status "📋 Configuration:"
 echo "  🆔 Client ID: $client_id"
 echo "  🔐 Client Secret: ${client_secret:0:8}..."
 echo "  🌐 API Base URL: $api_url"
-echo "  📱 Serial Port: $serial_device"
+echo "  📱 Serial Port: $serial_input"
 echo
 
 print_status "🔄 To apply changes, restart the TOSTI service:"

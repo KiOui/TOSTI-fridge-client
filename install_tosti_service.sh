@@ -6,8 +6,6 @@ set -e
 SERVICE_NAME="tosti-fridge"
 SERVICE_USER="pi"
 APP_DIR="/opt/tosti-fridge-client"
-KEYBOARD_DEVICE="/dev/input/by-id/usb-SM_SM-2D_PRODUCT_HID_KBW_APP-000000000-event-kbd"
-SETTINGS_MODULE="settings.production"
 
 # Colors for output
 RED='\033[0;31m'
@@ -160,89 +158,24 @@ if [[ "$confirm_response" =~ ^[Nn]$ ]]; then
 fi
 
 # Create environment file for systemd
-print_status "Creating environment configuration..."
+print_status "💾 Creating environment configuration..."
 sudo tee /etc/tosti-fridge.env > /dev/null << EOF
 # TOSTI Configuration
 # Generated during installation on $(date)
 TOSTI_CLIENT_SECRET=$CLIENT_SECRET
 TOSTI_CLIENT_ID=$CLIENT_ID
 TOSTI_API_BASE_URL=$API_BASE_URL
-TOSTI_SERIAL_INPUT=$SERIAL_DEVICE
+TOSTI_SERIAL_DEVICE=$SERIAL_DEVICE
 EOF
 
-sudo chmod 600 /etc/tosti-fridge.env
-sudo chown root:root /etc/tosti-fridge.env
+sudo chown root:pi /etc/tosti-fridge.env
+sudo chmod 640 /etc/tosti-fridge.env
 
-# Set up input group permissions for serial port access
-print_status "Setting up serial port permissions..."
-sudo usermod -a -G dialout "$SERVICE_USER"
-
-# Verify serial device exists
-SERIAL_DEVICE="/dev/serial/by-id/usb-SM_SM-2D_PRODUCT_USB_UART_APP-000000000-if00"
-if [ ! -e "$SERIAL_DEVICE" ]; then
-    print_error "Serial device $SERIAL_DEVICE not found!"
-    print_status "Available serial devices:"
-    ls -la /dev/serial/by-id/ 2>/dev/null || echo "No serial devices found"
-    print_warning "Make sure your QR scanner is:"
-    print_warning "1. Connected via USB"
-    print_warning "2. Configured for serial/UART mode (not HID keyboard mode)"
-    print_warning "3. Detected as a serial device"
-    print_warning "You can continue installation and configure the device path later."
-fi
-
-# Create keyboard input capture script
-print_status "Creating keyboard input capture script for QR scanner..."
-sudo tee /usr/local/bin/tosti-keyboard-reader > /dev/null << 'EOF'
-#!/bin/bash
-
-KEYBOARD_DEVICE="/dev/input/by-id/usb-SM_SM-2D_PRODUCT_HID_KBW_APP-000000000-event-kbd"
-FIFO_PATH="/tmp/tosti-keyboard-input"
-
-# Create named pipe if it doesn't exist
-if [ ! -p "$FIFO_PATH" ]; then
-    mkfifo "$FIFO_PATH"
-fi
-
-# Function to clean up on exit
-cleanup() {
-    rm -f "$FIFO_PATH"
-    exit 0
-}
-
-trap cleanup SIGTERM SIGINT
-
-# For QR scanner acting as keyboard: capture the actual text being "typed"
-# Use input-event to convert raw device input to actual characters
-sudo input-events "$KEYBOARD_DEVICE" 2>/dev/null | while read line; do
-    # input-events outputs lines like: "hello world" when scanner types
-    echo "$line" > "$FIFO_PATH"
-done
-EOF
-
-sudo chmod +x /usr/local/bin/tosti-keyboard-reader
-
-# Create systemd service for QR scanner reader
-print_status "Creating QR scanner reader service..."
-sudo tee /etc/systemd/system/tosti-keyboard-reader.service > /dev/null << EOF
-[Unit]
-Description=TOSTI QR Scanner Input Reader
-After=multi-user.target
-
-[Service]
-Type=simple
-User=root
-ExecStart=/usr/local/bin/tosti-keyboard-reader
-Restart=always
-RestartSec=5
-StandardOutput=journal
-StandardError=journal
-
-[Install]
-WantedBy=multi-user.target
-EOF
+# Set proper ownership
+sudo chown -R "$SERVICE_USER:$SERVICE_USER" "$APP_DIR"
 
 # Create main application service
-print_status "Creating TOSTI fridge service..."
+print_status "🔧 Creating TOSTI fridge service..."
 sudo tee /etc/systemd/system/${SERVICE_NAME}.service > /dev/null << EOF
 [Unit]
 Description=TOSTI Fridge Client
@@ -251,10 +184,11 @@ After=network.target
 [Service]
 Type=simple
 User=$SERVICE_USER
+Group=$SERVICE_USER
 WorkingDirectory=$APP_DIR/client
-Environment=PATH=$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PATH=/home/pi/.local/bin:/usr/local/bin:/usr/bin:/bin
 EnvironmentFile=/etc/tosti-fridge.env
-ExecStart=$HOME/.local/bin/poetry run python client.py --settings $SETTINGS_MODULE
+ExecStart=/home/pi/.local/bin/poetry run python client.py --settings settings.production
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -264,11 +198,8 @@ StandardError=journal
 WantedBy=multi-user.target
 EOF
 
-# Set proper ownership
-sudo chown -R "$SERVICE_USER:$SERVICE_USER" "$APP_DIR"
-
 # Reload systemd and enable service
-print_status "Enabling and starting service..."
+print_status "🚀 Enabling and starting service..."
 sudo systemctl daemon-reload
 sudo systemctl enable ${SERVICE_NAME}.service
 
@@ -276,7 +207,7 @@ sudo systemctl enable ${SERVICE_NAME}.service
 sudo systemctl start ${SERVICE_NAME}.service
 
 # Show status
-print_status "Installation complete! Service status:"
+print_status "📊 Installation complete! Service status:"
 echo
 sudo systemctl status ${SERVICE_NAME}.service --no-pager -l
 
