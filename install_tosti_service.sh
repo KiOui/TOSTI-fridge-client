@@ -81,7 +81,7 @@ print_status "✅ Using existing production.py configuration"
 print_status "🐍 Installing Python dependencies..."
 cd "$APP_DIR"
 export PATH="$HOME/.local/bin:$PATH"
-poetry install --with=production
+poetry install --only=main,production
 
 # Set up serial port permissions
 print_status "🔐 Setting up serial port permissions..."
@@ -284,6 +284,7 @@ print_status "📝 Configuration notes:"
 echo "1. ✅ API credentials configured: $CLIENT_ID"
 echo "2. ✅ Serial port configured: $SERIAL_DEVICE"
 echo "3. ✅ Service configured and started"
+echo "4. 🔧 Configure your fridge locks in $APP_DIR/client/settings/production.py if needed"
 echo
 print_status "🎉 Your TOSTI Fridge Client is ready to use!"
 echo "🧪 Test QR scanner by scanning a code - the result should appear in logs"

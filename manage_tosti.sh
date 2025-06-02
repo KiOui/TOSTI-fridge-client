@@ -65,8 +65,8 @@ show_status() {
         fi
         api_url=$(sudo grep "TOSTI_API_BASE_URL=" "$ENV_FILE" | cut -d'=' -f2-)
         echo "  🌐 API_BASE_URL: ${api_url:-[NOT SET]}"
-        serial_port=$(sudo grep "TOSTI_SERIAL_DEVICE=" "$ENV_FILE" | cut -d'=' -f2-)
-        echo "  📱 SERIAL_PORT: ${serial_port:-[NOT SET]}"
+        serial_port=$(sudo grep "TOSTI_SERIAL_INPUT=" "$ENV_FILE" | cut -d'=' -f2-)
+        echo "  📱 SERIAL_INPUT: ${serial_port:-[NOT SET]}"
 
         # Check if serial device exists
         if [ -n "$serial_port" ] && [ -e "$serial_port" ]; then
@@ -141,7 +141,7 @@ test_keyboard() {
 
     # Get serial port from environment file
     if [ -f "$ENV_FILE" ]; then
-        serial_port=$(sudo grep "TOSTI_SERIAL_DEVICE=" "$ENV_FILE" | cut -d'=' -f2-)
+        serial_port=$(sudo grep "TOSTI_SERIAL_INPUT=" "$ENV_FILE" | cut -d'=' -f2-)
         if [ -n "$serial_port" ] && [ -e "$serial_port" ]; then
             print_status "Reading from serial port: $serial_port"
             sudo cat "$serial_port"
