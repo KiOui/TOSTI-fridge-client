@@ -6,6 +6,7 @@ set -e
 SERVICE_NAME="tosti-fridge"
 SERVICE_USER="pi"
 APP_DIR="/opt/tosti-fridge-client"
+KEYBOARD_DEVICE="/dev/input/by-id/usb-SM_SM-2D_PRODUCT_HID_KBW_APP-000000000-event-kbd"
 SETTINGS_MODULE="settings.production"
 
 # Colors for output
@@ -35,30 +36,31 @@ fi
 print_status "🚀 Starting TOSTI Fridge Client installation..."
 
 # Update system packages
-print_status "Updating system packages..."
+print_status "📦 Updating system packages..."
 sudo apt update
 sudo apt upgrade -y
 
 # Install required system packages
-print_status "Installing system dependencies..."
+print_status "🔧 Installing system dependencies..."
 sudo apt install -y \
     python3 \
     python3-pip \
     python3-venv \
+    python3-rpi.gpio \
     git
 
 # Install Poetry
-print_status "Installing Poetry..."
+print_status "📝 Installing Poetry..."
 if ! command -v poetry &> /dev/null; then
     curl -sSL https://install.python-poetry.org | python3 -
     export PATH="$HOME/.local/bin:$PATH"
     echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 else
-    print_status "Poetry already installed"
+    print_status "✅ Poetry already installed"
 fi
 
 # Create application directory
-print_status "Setting up application directory..."
+print_status "📁 Setting up application directory..."
 if [ -d "$APP_DIR" ]; then
     print_warning "Application directory already exists. Backing up..."
     sudo mv "$APP_DIR" "${APP_DIR}.backup.$(date +%s)"
@@ -68,34 +70,21 @@ sudo mkdir -p "$APP_DIR"
 sudo chown "$SERVICE_USER:$SERVICE_USER" "$APP_DIR"
 
 # Copy application files
-print_status "Copying application files..."
+print_status "📋 Copying application files..."
 cp -r client "$APP_DIR/"
 cp pyproject.toml "$APP_DIR/"
 cp README.md "$APP_DIR/" 2>/dev/null || true
 
-print_status "Using existing production.py configuration"
-
-# Create environment file for systemd
-print_status "Setting up environment configuration..."
-sudo tee /etc/tosti-fridge.env > /dev/null << EOF
-# TOSTI API Configuration
-# Set your API credentials here
-TOSTI_CLIENT_SECRET=
-TOSTI_CLIENT_ID=
-TOSTI_API_BASE_URL=https://tosti.science.ru.nl
-EOF
-
-sudo chmod 600 /etc/tosti-fridge.env
-sudo chown root:root /etc/tosti-fridge.env
+print_status "✅ Using existing production.py configuration"
 
 # Install Python dependencies
-print_status "Installing Python dependencies..."
+print_status "🐍 Installing Python dependencies..."
 cd "$APP_DIR"
 export PATH="$HOME/.local/bin:$PATH"
 poetry install --only=main
 
 # Set up serial port permissions
-print_status "Setting up serial port permissions..."
+print_status "🔐 Setting up serial port permissions..."
 sudo usermod -a -G dialout "$SERVICE_USER"
 
 # Interactive configuration
@@ -104,8 +93,12 @@ echo
 
 # Show available serial devices
 print_status "🔍 Available serial devices:"
-ls -la /dev/serial/by-id/ 2>/dev/null || echo "No serial devices found"
-echo
+if ls /dev/serial/by-id/* 2>/dev/null; then
+    echo
+else
+    echo "No serial devices found"
+    echo
+fi
 
 # Prompt for serial device
 echo "📱 Enter the path to your QR scanner serial device:"
@@ -174,7 +167,7 @@ sudo tee /etc/tosti-fridge.env > /dev/null << EOF
 TOSTI_CLIENT_SECRET=$CLIENT_SECRET
 TOSTI_CLIENT_ID=$CLIENT_ID
 TOSTI_API_BASE_URL=$API_BASE_URL
-TOSTI_SERIAL_DEVICE=$SERIAL_DEVICE
+TOSTI_SERIAL_INPUT=$SERIAL_DEVICE
 EOF
 
 sudo chmod 600 /etc/tosti-fridge.env

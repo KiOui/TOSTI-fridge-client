@@ -133,12 +133,13 @@ QR Scanner → Serial Port → SerialPort Scanner → Python App → GPIO Locks
 
 ### Check Serial Device
 ```bash
-ls -la /dev/serial/by-id/
+ls /dev/serial/by-id/
 ```
 
 ### Manual Serial Port Test
 ```bash
 sudo cat /dev/serial/by-id/your-qr-scanner-device
+# Example: sudo cat /dev/serial/by-id/usb-SM_SM-2D_PRODUCT_USB_UART_APP-000000000-if00
 ```
 
 ### Verify Environment Variables
