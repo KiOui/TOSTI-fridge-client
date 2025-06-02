@@ -7,7 +7,7 @@ from fridge import Fridge
 from scanners import SerialPort
 
 SCANNER_CLASS = SerialPort
-SCANNER_INPUT_PARAMETERS = ("/dev/ttyUSB0",)
+SCANNER_INPUT_PARAMETERS = os.getenv("TOSTI_SERIAL_DEVICE")
 FRIDGE_CLASS = Fridge
 CLIENT_SECRET = os.getenv("TOSTI_CLIENT_SECRET")
 CLIENT_ID = os.getenv("TOSTI_CLIENT_ID")
