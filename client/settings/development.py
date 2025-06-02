@@ -9,6 +9,7 @@ from fakefridge import FakeFridge
 from scanners import Console
 
 SCANNER_CLASS = Console
+SCANNER_INPUT_PARAMETERS = ()
 FRIDGE_CLASS = FakeFridge
 CLIENT_SECRET = (
     "wYQ8OJyEK85G7bN6DFuE5SekD8noHK0R3CoF6piVtX68Mv21vyQxhcmXtsJtR7y5dDgw7a0ldOLOcH4mYFC8ziyPVgQZjjoS"

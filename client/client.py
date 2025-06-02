@@ -21,7 +21,7 @@ class Main:
         self.settings = settings
         self._currently_processing_records = list()
         self._lock = ThreadLock()
-        self.scanner = self.settings.SCANNER_CLASS()
+        self.scanner = self.settings.SCANNER_CLASS(*self.settings.SCANNER_INPUT_PARAMETERS)
 
         if not hasattr(self.settings, "CLIENT_ID"):
             raise ImproperlyConfigured("CLIENT_ID setting should be specified in settings config.")
