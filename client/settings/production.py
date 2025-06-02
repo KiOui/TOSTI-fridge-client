@@ -15,7 +15,7 @@ API_BASE_URL = os.getenv("TOSTI_API_BASE_URL", "https://tosti.science.ru.nl")
 
 LOCK_CONFIGURATION = [
     {
-        "slug": "beerfridge",
+        "slug": "bierkoelkast-zuid",
         "connected_gpio_pins": [4],
     },
 ]
