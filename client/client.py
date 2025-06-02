@@ -59,6 +59,8 @@ class Main:
                     unlock_for = float(fridge_unlock_information["unlock_for"])
                     logger.debug("Unlocking fridge {} for {} seconds".format(fridge_name, unlock_for))
                     self.fridge_locks[fridge_name].unlock_for(unlock_for)
+                else:
+                    logger.error(f"No fridge found for slug '{fridge_name}'")
         else:
             logger.debug("Server responded with status code {}".format(answer.status_code))
 
