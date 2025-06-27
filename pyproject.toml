@@ -10,8 +10,9 @@ packages = [{include = "client"}]
 [tool.poetry.dependencies]
 # Core dependencies (work on all platforms)
 python = "^3.11"
-oauthlib = "^3.2.2"
+oauthlib = "^3.3.1"
 requests-oauthlib = "^2.0.0"
+pyserial = "^3.5.0"
 
 [tool.poetry.group.production.dependencies]
 "RPi.GPIO" = "^0.7.1"

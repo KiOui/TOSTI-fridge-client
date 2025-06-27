@@ -8,7 +8,6 @@ This guide will help you install and configure the TOSTI Fridge Client as a back
 - **🚀 Background Service**: Runs automatically on boot  
 - **📱 Serial Port QR Scanner**: Direct USB QR scanner integration via serial port
 - **🛠️ Service Management**: Easy start/stop/restart commands
-- **📝 Logging**: Centralized logging via systemd
 - **🔄 Zero Code Changes**: Works with your existing Python code
 
 ## 🚀 Quick Installation
@@ -101,12 +100,6 @@ Configure:
    - Reads QR scan results directly from serial port
    - Manages fridge locks via GPIO
 
-### Data Flow
-
-```
-QR Scanner → Serial Port → SerialPort Scanner → Python App → GPIO Locks
-```
-
 ## Security Features
 
 - **Environment Variables**: API credentials stored securely outside code
@@ -197,28 +190,6 @@ sudo journalctl -u tosti-fridge -f
 Edit `/etc/tosti-fridge.env` and update:
 ```bash
 TOSTI_SERIAL_DEVICE=/dev/serial/by-id/your-qr-scanner-device
-```
-
-### Multiple QR Scanners
-Configure multiple serial devices or use a USB hub with different device paths.
-
-### Scanner Configuration
-- Ensure QR scanner is in **Serial/UART mode**
-- Configure scanner baud rate if needed (usually 9600 or 115200)
-- Some scanners have dip switches or configuration barcodes for serial mode
-
-### Custom Logging
-Edit production.py to customize logging:
-```python
-import logging
-logging.basicConfig(
-    level=logging.DEBUG,  # Change log level
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('/var/log/tosti-fridge.log'),
-        logging.StreamHandler()
-    ]
-)
 ```
 
 ## Updating
